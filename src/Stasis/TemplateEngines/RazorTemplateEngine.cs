@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using RazorEngine;
 using RazorEngine.Templating;
 using Stasis.ContentModel;
@@ -33,8 +34,11 @@ namespace Stasis.TemplateEngines
                     {
                         Name = "World"
                     });
-            
-            return new TextResult(result);
+
+            var extension = item.SourceKey.Split(".").Last();
+            var htmlPath = item.SourceKey.Replace("." + extension, ".html");
+
+            return new HtmlResult(result, htmlPath);
         }
     }
 }

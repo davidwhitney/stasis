@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Stasis.ContentModel.DataExtraction;
+using Stasis.DataExtraction;
+using Stasis.DataSources;
 using Stasis.Output;
 using Stasis.TemplateEngines;
 
@@ -19,8 +19,9 @@ namespace Stasis
             ItemConverters.Add(new RazorItemConverter());
             ItemConverters.Add(new MarkdownItemConverter());
 
+            TemplateEngines.Add(new NoTemplateEngine());
             TemplateEngines.Add(new RazorTemplateEngine());
-            TemplateEngines.Add(new MarkdownTemplateEngine());
+            TemplateEngines.Add(new MustacheTemplateEngine());
         }
 
         public async Task Generate(SiteConfiguration config)
@@ -29,30 +30,22 @@ namespace Stasis
             {
                 await foreach (var rawItem in registration.DataSource.GetItems())
                 {
-                    var converter = ItemConverters.First(x => x.Supports(rawItem.ContentType));
-                    var item = converter.ConvertToItem(rawItem.Content);
-                    item.SourceKey = rawItem.SourceKey;
-
-                    // locate template using the templating strategy
-                    // apply template to the content
-                    var template = new Template
-                    {
-                        Kind = ".md",
-                        Content = Encoding.UTF8.GetBytes("{{Content}}")
-                    };
-
-                    var processor = TemplateEngines.First(x => x.SupportedExtensions.Contains(template.Kind));
-                    var contentProcessingResult = processor.Process(item, template);
-
-                    Output.Save(contentProcessingResult.OutputPath, contentProcessingResult);
+                    ProcessContentItem(rawItem, registration);
                 }
             }
         }
-    }
 
-    public class Template
-    {
-        public string Kind { get; set; }
-        public byte[] Content { get; set; }
+        private void ProcessContentItem(RawItem rawItem, ContentRegistration registration)
+        {
+            var template = registration.TemplateFinder.SelectTemplate();
+            var processor = TemplateEngines.First(x => x.SupportedExtensions.Contains(template.Kind));
+            var converter = ItemConverters.First(x => x.Supports(rawItem.ContentType));
+
+            var item = converter.ConvertToItem(rawItem.Content);
+            item.SourceKey = rawItem.SourceKey;
+            var contentProcessingResult = processor.Process(item, template);
+
+            Output.Save(contentProcessingResult.OutputPath, contentProcessingResult);
+        }
     }
 }

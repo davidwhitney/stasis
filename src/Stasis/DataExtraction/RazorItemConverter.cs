@@ -1,9 +1,10 @@
 ﻿using System;
 using RazorEngine;
 using RazorEngine.Templating;
+using Stasis.ContentModel;
 using Encoding = System.Text.Encoding;
 
-namespace Stasis.ContentModel.DataExtraction
+namespace Stasis.DataExtraction
 {
     public class RazorItemConverter : IItemConverter
     {
@@ -25,7 +26,8 @@ namespace Stasis.ContentModel.DataExtraction
 
             return new TextItem
             {
-                Content = result
+                Content = result,
+                RawContent = templateText
             };
         }
     }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
-using Stasis.ContentModel.DataExtraction;
+using Stasis.DataExtraction;
 
 namespace Stasis.Test.Unit.ContentProcessing
 {
@@ -29,7 +29,7 @@ another: variable
 
             var result = _sut.Extract(markdown.TrimStart());
 
-            Assert.That(result.Content, Is.EqualTo("# title"));
+            Assert.That(result.RawContent, Is.EqualTo("# title"));
             Assert.That(result.Properties["some"], Is.EqualTo("value"));
             Assert.That(result.Properties["another"], Is.EqualTo("variable"));
         }

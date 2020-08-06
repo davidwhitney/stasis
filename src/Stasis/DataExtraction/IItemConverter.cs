@@ -1,4 +1,6 @@
-﻿namespace Stasis.ContentModel.DataExtraction
+﻿using Stasis.ContentModel;
+
+namespace Stasis.DataExtraction
 {
     public interface IItemConverter
     {

@@ -6,7 +6,7 @@ namespace Stasis.Test.Unit.TestHelpers
     {
         public static string AsString(this ProcessingResultBase src)
         {
-            return src is TextResult result ? result.Content : null;
+            return src is HtmlResult result ? result.Content : null;
         }
     }
 }

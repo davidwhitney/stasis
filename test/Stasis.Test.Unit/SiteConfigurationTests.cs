@@ -1,7 +1,9 @@
 ﻿using System;
 using NUnit.Framework;
+using Stasis.ContentModel;
 using Stasis.DataSources;
 using Stasis.TemplateDiscovery;
+using Stasis.TemplateEngines;
 using Stasis.Test.Unit.TestHelpers;
 
 namespace Stasis.Test.Unit
@@ -45,8 +47,13 @@ namespace Stasis.Test.Unit
 
             Assert.That(_sut.ContentRegistrations[0].TemplateFinder, Is.TypeOf<MyRandomTemplateThing>());
         }
+
         private class MyRandomTemplateThing : IFindTemplates
         {
+            public Template SelectTemplate()
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

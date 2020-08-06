@@ -12,6 +12,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Language" Version="3.1.6" />
     <PackageReference Include="RazorEngine.NetCore" Version="3.1.0" />
+    <PackageReference Include="Stubble.Core" Version="1.9.3" />
   </ItemGroup>
 
 </Project>
