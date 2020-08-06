@@ -1,25 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using Stasis.ContentModel;
 
 namespace Stasis.DataSources
 {
     public class DelegatedDataSource : IDataSource
     {
-        private readonly Func<IEnumerable<Item>> _getItemsFunction;
-        private readonly Func<IAsyncEnumerable<Item>> _getItemsFunctionAsync;
+        private readonly Func<IEnumerable<RawItem>> _getItemsFunction;
+        private readonly Func<IAsyncEnumerable<RawItem>> _getItemsFunctionAsync;
 
-        public DelegatedDataSource(Func<IEnumerable<Item>> getItemsFunction)
+        public DelegatedDataSource(Func<IEnumerable<RawItem>> getItemsFunction)
         {
             _getItemsFunction = getItemsFunction;
         }
 
-        public DelegatedDataSource(Func<IAsyncEnumerable<Item>> getItemsFunction)
+        public DelegatedDataSource(Func<IAsyncEnumerable<RawItem>> getItemsFunction)
         {
             _getItemsFunctionAsync = getItemsFunction;
         }
 
-        public async IAsyncEnumerable<Item> GetItems()
+        public async IAsyncEnumerable<RawItem> GetItems()
         {
             if (_getItemsFunction != null)
             {

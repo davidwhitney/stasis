@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Stasis.ContentModel;
 
 namespace Stasis.DataSources
 {
@@ -13,7 +12,7 @@ namespace Stasis.DataSources
             _path = path;
         }
 
-        public async IAsyncEnumerable<Item> GetItems()
+        public async IAsyncEnumerable<RawItem> GetItems()
         {
             var allFiles = Directory.GetFiles(_path, "*.*", SearchOption.AllDirectories);
 
@@ -25,11 +24,11 @@ namespace Stasis.DataSources
 
                 var contents = await File.ReadAllBytesAsync(file);
 
-                yield return new Item
+                yield return new RawItem
                 {
                     SourceKey = relativePath,
-                    DestinationKey = htmlPath,
-                    Content = contents
+                    Content = contents,
+                    ContentType = fileDetails.Extension
                 };
             }
         }

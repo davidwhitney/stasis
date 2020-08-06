@@ -5,6 +5,6 @@ namespace Stasis.DataSources
 {
     public interface IDataSource
     {
-        IAsyncEnumerable<Item> GetItems();
+        IAsyncEnumerable<RawItem> GetItems();
     }
 }

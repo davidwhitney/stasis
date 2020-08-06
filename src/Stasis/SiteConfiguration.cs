@@ -25,14 +25,14 @@ namespace Stasis
             return this;
         }
 
-        public SiteConfiguration AddContent(Func<IAsyncEnumerable<Item>> loadItemsFunction, Action<ContentRegistration> onContentRegistrationCreation = null)
+        public SiteConfiguration AddContent(Func<IAsyncEnumerable<RawItem>> loadItemsFunction, Action<ContentRegistration> onContentRegistrationCreation = null)
         {
             var delegatedDataSource = new DelegatedDataSource(loadItemsFunction);
             AddContent(delegatedDataSource, onContentRegistrationCreation);
             return this;
         }
 
-        public SiteConfiguration AddContent(Func<IEnumerable<Item>> loadItemsFunction, Action<ContentRegistration> onContentRegistrationCreation = null)
+        public SiteConfiguration AddContent(Func<IEnumerable<RawItem>> loadItemsFunction, Action<ContentRegistration> onContentRegistrationCreation = null)
         {
             var delegatedDataSource = new DelegatedDataSource(loadItemsFunction);
             AddContent(delegatedDataSource, onContentRegistrationCreation);

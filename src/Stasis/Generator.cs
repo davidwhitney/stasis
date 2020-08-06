@@ -1,36 +1,58 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using Stasis.ContentProcessing;
-using Stasis.ContentProcessing.Markdown;
+using Stasis.ContentModel.DataExtraction;
 using Stasis.Output;
+using Stasis.TemplateEngines;
 
 namespace Stasis
 {
     public class Generator
     {
-        public List<IContentProcessor> ContentProcessors { get; } = new List<IContentProcessor>();
+        public List<IItemConverter> ItemConverters { get; } = new List<IItemConverter>();
+        public List<ITemplateEngine> TemplateEngines { get; } = new List<ITemplateEngine>();
         public IOutputDestination Output { get; set; } = new InMemoryOutputDestination();
 
         public Generator()
         {
-            ContentProcessors.Add(new RazorProcessor());
-            ContentProcessors.Add(new MarkdownProcessor());
+            ItemConverters.Add(new RazorItemConverter());
+            ItemConverters.Add(new MarkdownItemConverter());
+
+            TemplateEngines.Add(new RazorTemplateEngine());
+            TemplateEngines.Add(new MarkdownTemplateEngine());
         }
 
         public async Task Generate(SiteConfiguration config)
         {
             foreach (var registration in config.ContentRegistrations)
             {
-                await foreach (var item in registration.DataSource.GetItems())
+                await foreach (var rawItem in registration.DataSource.GetItems())
                 {
-                    var processor = ContentProcessors.First(x => x.Supports(item));
-                    var contentProcessingResult = processor.Process(item);
+                    var converter = ItemConverters.First(x => x.Supports(rawItem.ContentType));
+                    var item = converter.ConvertToItem(rawItem.Content);
+                    item.SourceKey = rawItem.SourceKey;
 
-                    Output.Save(item.DestinationKey, contentProcessingResult);
+                    // locate template using the templating strategy
+                    // apply template to the content
+                    var template = new Template
+                    {
+                        Kind = ".md",
+                        Content = Encoding.UTF8.GetBytes("{{Content}}")
+                    };
+
+                    var processor = TemplateEngines.First(x => x.SupportedExtensions.Contains(template.Kind));
+                    var contentProcessingResult = processor.Process(item, template);
+
+                    Output.Save(contentProcessingResult.OutputPath, contentProcessingResult);
                 }
             }
         }
+    }
 
+    public class Template
+    {
+        public string Kind { get; set; }
+        public byte[] Content { get; set; }
     }
 }

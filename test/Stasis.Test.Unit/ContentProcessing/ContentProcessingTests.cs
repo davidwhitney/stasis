@@ -2,20 +2,19 @@
 using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
-using Stasis.ContentProcessing;
-using Stasis.ContentProcessing.Markdown;
+using Stasis.ContentModel.DataExtraction;
 
 namespace Stasis.Test.Unit.ContentProcessing
 {
     [TestFixture]
-    public class MarkdownUnpackerTests
+    public class MarkdownItemConverterTests
     {
-        private MarkdownUnpacker _sut;
+        private MarkdownItemConverter _sut;
 
         [SetUp]
         public void Setup()
         {
-            _sut = new MarkdownUnpacker();
+            _sut = new MarkdownItemConverter();
         }
 
         [Test]
@@ -28,11 +27,11 @@ another: variable
 ---
 # title";
 
-            var result = _sut.Unpack(markdown.TrimStart());
+            var result = _sut.Extract(markdown.TrimStart());
 
-            Assert.That(result.Body, Is.EqualTo("# title"));
-            Assert.That(result.FrontMatter["some"], Is.EqualTo("value"));
-            Assert.That(result.FrontMatter["another"], Is.EqualTo("variable"));
+            Assert.That(result.Content, Is.EqualTo("# title"));
+            Assert.That(result.Properties["some"], Is.EqualTo("value"));
+            Assert.That(result.Properties["another"], Is.EqualTo("variable"));
         }
     }
 }

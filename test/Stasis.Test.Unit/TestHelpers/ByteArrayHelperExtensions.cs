@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Stasis.ContentProcessing;
+﻿using Stasis.TemplateEngines;
 
 namespace Stasis.Test.Unit.TestHelpers
 {
