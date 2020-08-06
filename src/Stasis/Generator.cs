@@ -1,44 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Stasis.ContentProcessing;
-using Stasis.DataSources;
+using Stasis.ContentProcessing.Markdown;
 using Stasis.Output;
 
 namespace Stasis
 {
-    public class SiteConfiguration
-    {
-        public List<ContentRegistration> ContentRegistrations { get; } = new List<ContentRegistration>();
-
-        public SiteConfiguration AddContent(string source)
-        {
-            if (Directory.Exists(source))
-            {
-                AddContent(new DirectoryDataSource(source));
-            }
-            else
-            {
-                throw new InvalidOperationException("Data source not recognised");
-            }
-
-            return this;
-        }
-
-        public SiteConfiguration AddContent(IDataSource source)
-        {
-            var registration = new ContentRegistration
-            {
-                DataSource = source
-            };
-
-            ContentRegistrations.Add(registration);
-            return this;
-        }
-    }
-
     public class Generator
     {
         public List<IContentProcessor> ContentProcessors { get; } = new List<IContentProcessor>();
@@ -57,9 +25,9 @@ namespace Stasis
                 await foreach (var item in registration.DataSource.GetItems())
                 {
                     var processor = ContentProcessors.First(x => x.Supports(item));
-                    var bytes = processor.Process(item);
+                    var contentProcessingResult = processor.Process(item);
 
-                    Output.Save(item.DestinationKey, bytes);
+                    Output.Save(item.DestinationKey, contentProcessingResult);
                 }
             }
         }

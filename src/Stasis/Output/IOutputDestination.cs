@@ -1,7 +1,9 @@
-﻿namespace Stasis.Output
+﻿using Stasis.ContentProcessing;
+
+namespace Stasis.Output
 {
     public interface IOutputDestination
     {
-        void Save(string path, byte[] contents);
+        void Save(string path, ProcessingResultBase contents);
     }
 }

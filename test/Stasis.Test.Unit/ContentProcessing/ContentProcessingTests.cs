@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
 using Stasis.ContentProcessing;
+using Stasis.ContentProcessing.Markdown;
 
 namespace Stasis.Test.Unit.ContentProcessing
 {

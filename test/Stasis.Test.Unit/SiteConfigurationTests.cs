@@ -1,6 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using Stasis.DataSources;
+using Stasis.TemplateDiscovery;
 using Stasis.Test.Unit.TestHelpers;
 
 namespace Stasis.Test.Unit
@@ -28,10 +29,24 @@ namespace Stasis.Test.Unit
         [Test]
         public void AddDataSource_ValidFolderPath_AddsSource()
         {
-            var config = new SiteConfiguration().AddContent(TestContent.Location("SingleRazorFile"));
+            _sut.AddContent(TestContent.Location("SingleRazorFile"));
 
-            Assert.That(config.ContentRegistrations.Count, Is.EqualTo(1));
-            Assert.That(config.ContentRegistrations[0].DataSource, Is.TypeOf<DirectoryDataSource>());
+            Assert.That(_sut.ContentRegistrations.Count, Is.EqualTo(1));
+            Assert.That(_sut.ContentRegistrations[0].DataSource, Is.TypeOf<DirectoryDataSource>());
+        }
+
+        [Test]
+        public void AddDataSource_CanOverwriteTemplateSettingsUsingCallback()
+        {
+            _sut.AddContent(TestContent.Location("SingleRazorFile"), cr =>
+            {
+                cr.TemplateFinder = new MyRandomTemplateThing();
+            });
+
+            Assert.That(_sut.ContentRegistrations[0].TemplateFinder, Is.TypeOf<MyRandomTemplateThing>());
+        }
+        private class MyRandomTemplateThing : IFindTemplates
+        {
         }
     }
 }

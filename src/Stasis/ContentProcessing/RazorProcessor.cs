@@ -6,6 +6,11 @@ using Encoding = System.Text.Encoding;
 
 namespace Stasis.ContentProcessing
 {
+    // Razor files are kinda content, and kinda already templates as Razor is a templating engine
+    // So if we're treating them as content, I guess we'll just return them fully formed.
+    // The expectation is that if you're using razor, you'll be using razors default _Layouts
+    // and we won't do any template resolution on top of the output of the Razor rendering
+
     public class RazorProcessor : IContentProcessor
     {
         public bool Supports(Item item)
@@ -15,7 +20,7 @@ namespace Stasis.ContentProcessing
             return fileDetails.Extension == ".cshtml";
         }
 
-        public byte[] Process(Item item)
+        public ProcessingResultBase Process(Item item)
         {
             var filePath = item.SourceKey;
             var fileDetails = new FileInfo(filePath);
@@ -30,9 +35,8 @@ namespace Stasis.ContentProcessing
                     {
                         Name = "World"
                     });
-
-            var asBytes = System.Text.Encoding.UTF8.GetBytes(result);
-            return asBytes;
+            
+            return new TextResult(result);
         }
     }
 }
