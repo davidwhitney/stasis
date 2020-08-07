@@ -1,14 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Stasis.ContentModel;
 
 namespace Stasis.TemplateEngines
 {
-    public class NoTemplateEngine : ITemplateEngine
+    public class NoTemplateEngine : ITemplateEngine<NullTemplate>
     {
-        public List<string> SupportedExtensions { get; } = new List<string> {"no-template"};
-        public ProcessingResultBase Process(Item item, Template template)
+        public ProcessingResultBase Process<TTemplateType>(Item item, TTemplateType template) where TTemplateType : ITemplate
+        {
+            return Process(item, template as NullTemplate);
+        }
+
+        public bool Supports(string templateName) => false;
+
+        public ITemplate CreateTemplateInstance(byte[] templateBytes)
+        {
+            return new NoTemplate();
+        }
+
+        public ProcessingResultBase Process(Item item, NullTemplate template)
         {
             var extension = item.SourceKey.Split(".").Last();
             var htmlPath = item.SourceKey.Replace("." + extension, ".html");

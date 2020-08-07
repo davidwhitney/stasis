@@ -1,8 +1,7 @@
 ﻿namespace Stasis.ContentModel
 {
-    public class Template
+    public interface ITemplate
     {
-        public string Kind { get; set; }
-        public byte[] Content { get; set; }
+        byte[] Content { get; set; }
     }
 }

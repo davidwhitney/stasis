@@ -1,51 +1,18 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 using Stasis.ContentModel;
 
 namespace Stasis.TemplateEngines
 {
     public interface ITemplateEngine
     {
-        List<string> SupportedExtensions { get; }
-        ProcessingResultBase Process(Item item, Template template);
+        bool Supports(string templateName);
+        ProcessingResultBase Process<TTemplateType>(Item item, TTemplateType template) where TTemplateType : ITemplate;
+        ITemplate CreateTemplateInstance(byte[] templateBytes);
     }
 
-    public abstract class ProcessingResultBase
+    public interface ITemplateEngine<in TTemplateType> : ITemplateEngine
+        where TTemplateType : ITemplate
     {
-        public string OutputPath { get; set; }
-        public abstract byte[] ContentBytes { get; set; }
-
-        protected ProcessingResultBase(string outputPath)
-        {
-            OutputPath = outputPath;
-        }
-    }
-
-    public class HtmlResult : ProcessingResultBase
-    {
-        public string Content { set; get; }
-
-        public override byte[] ContentBytes
-        {
-            get => Encoding.UTF8.GetBytes(Content);
-            set => Content = Encoding.UTF8.GetString(value);
-        }
-
-        public HtmlResult(string content, string outputPath) 
-            : base(outputPath)
-        {
-            Content = content;
-        }
-    }
-
-    public sealed class BinaryResult : ProcessingResultBase
-    {
-        public override byte[] ContentBytes { get; set; }
-
-        public BinaryResult(byte[] contentBytes, string outputPath)
-            : base(outputPath)
-        {
-            ContentBytes = contentBytes;
-        }
+        ProcessingResultBase Process(Item item, TTemplateType template);
     }
 }

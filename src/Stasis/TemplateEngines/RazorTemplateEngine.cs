@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using RazorEngine;
 using RazorEngine.Templating;
 using Stasis.ContentModel;
-using Encoding = System.Text.Encoding;
 
 namespace Stasis.TemplateEngines
 {
@@ -13,11 +11,24 @@ namespace Stasis.TemplateEngines
     // The expectation is that if you're using razor, you'll be using razors default _Layouts
     // and we won't do any template resolution on top of the output of the Razor rendering
 
-    public class RazorTemplateEngine : ITemplateEngine
+    public class RazorTemplateEngine : ITemplateEngine<RazorTemplate>
     {
-        public List<string> SupportedExtensions { get; } = new List<string> {".cshtml"};
+        public ProcessingResultBase Process<TTemplateType>(Item item, TTemplateType template) where TTemplateType : ContentModel.ITemplate
+        {
+            return Process(item, template as RazorTemplate);
+        }
 
-        public ProcessingResultBase Process(Item item, Template template)
+        public bool Supports(string templateName)
+        {
+            return new[] { ".cshtml", ".razor" }.Any(templateName.EndsWith);
+        }
+
+        public ContentModel.ITemplate CreateTemplateInstance(byte[] templateBytes)
+        {
+            return new RazorTemplate() { Content = templateBytes };
+        }
+
+        public ProcessingResultBase Process(Item item, RazorTemplate template)
         {
             // Load template file here, and use item as bound view model.
 

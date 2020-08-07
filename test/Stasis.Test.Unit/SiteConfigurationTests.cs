@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using Stasis.ContentModel;
 using Stasis.DataSources;
@@ -50,7 +51,7 @@ namespace Stasis.Test.Unit
 
         private class MyRandomTemplateThing : IFindTemplates
         {
-            public Template SelectTemplate()
+            public ITemplate SelectTemplate(RawItem rawItem, List<ITemplateEngine> templateEngines)
             {
                 throw new NotImplementedException();
             }

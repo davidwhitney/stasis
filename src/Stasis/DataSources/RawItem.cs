@@ -1,4 +1,6 @@
-﻿namespace Stasis.DataSources
+﻿using System.IO;
+
+namespace Stasis.DataSources
 {
     public class RawItem
     {

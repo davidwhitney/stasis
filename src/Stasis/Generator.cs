@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Stasis.ContentModel;
 using Stasis.DataExtraction;
 using Stasis.DataSources;
 using Stasis.Output;
+using Stasis.TemplateDiscovery;
 using Stasis.TemplateEngines;
 
 namespace Stasis
@@ -11,7 +14,7 @@ namespace Stasis
     public class Generator
     {
         public List<IItemConverter> ItemConverters { get; } = new List<IItemConverter>();
-        public List<ITemplateEngine> TemplateEngines { get; } = new List<ITemplateEngine>();
+        public List<ITemplateEngine> SupportedTemplateEngines { get; } = new List<ITemplateEngine>();
         public IOutputDestination Output { get; set; } = new InMemoryOutputDestination();
 
         public Generator()
@@ -19,9 +22,9 @@ namespace Stasis
             ItemConverters.Add(new RazorItemConverter());
             ItemConverters.Add(new MarkdownItemConverter());
 
-            TemplateEngines.Add(new NoTemplateEngine());
-            TemplateEngines.Add(new RazorTemplateEngine());
-            TemplateEngines.Add(new MustacheTemplateEngine());
+            SupportedTemplateEngines.Add(new NoTemplateEngine());
+            SupportedTemplateEngines.Add(new RazorTemplateEngine());
+            SupportedTemplateEngines.Add(new MustacheTemplateEngine());
         }
 
         public async Task Generate(SiteConfiguration config)
@@ -37,15 +40,43 @@ namespace Stasis
 
         private void ProcessContentItem(RawItem rawItem, ContentRegistration registration)
         {
-            var template = registration.TemplateFinder.SelectTemplate();
-            var processor = TemplateEngines.First(x => x.SupportedExtensions.Contains(template.Kind));
-            var converter = ItemConverters.First(x => x.Supports(rawItem.ContentType));
+            var converter = ItemConverters.FirstOrDefault(x => x.Supports(rawItem.ContentType));
+            if (converter == null)
+            {
+                // Cannot handle this kind of item, log this.
+                return;
+            }
+
+            var template = registration.DataSource is IFindTemplates templateSourcing
+                ? templateSourcing.SelectTemplate(rawItem, SupportedTemplateEngines)
+                : registration.TemplateFinder.SelectTemplate(rawItem, SupportedTemplateEngines);
+
+            var templateEngine = SupportedTemplateEngines.TemplateEngineForTemplate(template);
 
             var item = converter.ConvertToItem(rawItem.Content);
             item.SourceKey = rawItem.SourceKey;
-            var contentProcessingResult = processor.Process(item, template);
+            var contentProcessingResult = templateEngine.Process(item, template);
 
             Output.Save(contentProcessingResult.OutputPath, contentProcessingResult);
+        }
+    }
+
+    public static class TypeExtensions
+    {
+        public static ITemplateEngine TemplateEngineForTemplate(this IEnumerable<ITemplateEngine> engines, ITemplate template)
+        {
+            return engines.FirstOrDefault(te => te.GetType().IsForTemplate(template))
+                   ?? new NoTemplateEngine();
+        }
+
+        public static bool IsForTemplate(this Type type, ITemplate template)
+        {
+            var templateEngineGenericInterfaceTypeArg = type.GetInterfaces()
+                .Single(i => i.Name == "ITemplateEngine`1")
+                .GetGenericArguments()
+                .Single();
+
+            return templateEngineGenericInterfaceTypeArg == template.GetType();
         }
     }
 }

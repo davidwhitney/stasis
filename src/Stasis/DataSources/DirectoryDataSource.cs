@@ -18,18 +18,8 @@ namespace Stasis.DataSources
 
             foreach (var file in allFiles)
             {
-                var fileDetails = new FileInfo(file);
-                var relativePath = file.Replace(_path, "").Replace("\\", "/");
-                var htmlPath = relativePath.Replace(fileDetails.Extension, ".html");
-
                 var contents = await File.ReadAllBytesAsync(file);
-
-                yield return new RawItem
-                {
-                    SourceKey = relativePath,
-                    Content = contents,
-                    ContentType = fileDetails.Extension
-                };
+                yield return new LocalFileSystemItem(_path, file, contents);
             }
         }
 
