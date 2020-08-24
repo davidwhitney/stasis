@@ -22,24 +22,19 @@ namespace Stasis.TemplateDiscovery
 
             if (rawItem is LocalFileSystemItem localItem)
             {
-                var rootLocation = localItem.ContentRoot;
-                var siblingFiles = Directory.GetFiles(rootLocation, "*.*", SearchOption.TopDirectoryOnly);
+                var siblingFiles = Directory.GetFiles(localItem.ContentRoot, "*.*", SearchOption.TopDirectoryOnly);
 
-                foreach (var file in siblingFiles)
+                var validTemplates = siblingFiles.Where(file => validTemplateFileNames.Any(file.Contains)).ToList();
+                var supportedTemplates = validTemplates.Where(x => templateEngines.Any(engine => engine.Supports(x)));
+
+                var firstSupportedTemplateFile = supportedTemplates.FirstOrDefault();
+                if (firstSupportedTemplateFile == null)
                 {
-                    if (!validTemplateFileNames.Any(templatePrefix => file.Contains(templatePrefix)))
-                    {
-                        continue;
-                    }
-
-                    var supportingEngine = templateEngines.FirstOrDefault(x => x.Supports(file));
-
-                    if (supportingEngine != null)
-                    {
-                        // Got a supported template!
-                        return supportingEngine.CreateTemplateInstance(File.ReadAllBytes(file));
-                    }
+                    return new NoTemplate();
                 }
+
+                var engineForTemplate = templateEngines.First(x => x.Supports(firstSupportedTemplateFile));
+                return engineForTemplate.CreateTemplateInstance(File.ReadAllBytes(firstSupportedTemplateFile));
             }
 
             return new NoTemplate();

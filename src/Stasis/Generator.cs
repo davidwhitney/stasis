@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Stasis.ContentModel;
@@ -57,7 +58,20 @@ namespace Stasis
             item.SourceKey = rawItem.SourceKey;
             var contentProcessingResult = templateEngine.Process(item, template);
 
-            Output.Save(contentProcessingResult.OutputPath, contentProcessingResult);
+            var outputPath = ProcessPath(contentProcessingResult.OutputPath);
+
+            Output.Save(outputPath, contentProcessingResult);
+        }
+
+        private string ProcessPath(string outputPath)
+        {
+            if (outputPath.ToLower().EndsWith("index.html"))
+            {
+                return outputPath;
+            }
+
+            var extension = Path.GetExtension(outputPath);
+            return outputPath.Replace(extension, "/index.html");
         }
     }
 

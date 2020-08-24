@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using Stasis.Output;
 using Stasis.Test.Unit.TestHelpers;
@@ -38,6 +39,28 @@ namespace Stasis.Test.Unit
 
             Assert.That(_output.Files["/Index.html"], Is.Not.Null);
             Assert.That(_output.Files["/Index.html"].AsString(), Does.Contain("<h1 id=\"this-is-some-text\">This is some text</h1>"));
+        }
+
+        [Test]
+        public async Task Generate_MultipleMarkdownFiles_AddsHtmlFilesToOutputAsIndexFilesAtCorrectDepths()
+        {
+            var config = new SiteConfiguration().AddContent(TestContent.Location("MultipleMarkdownFiles"));
+
+            await _sut.Generate(config);
+
+            Assert.That(_output.Files["/Index.html"], Is.Not.Null);
+            Assert.That(_output.Files["/Index2/Index.html"], Is.Not.Null);
+        }
+
+        [Test]
+        public async Task Generate_MultipleMarkdownFilesInNestedDirectories_AddsHtmlFilesToOutput()
+        {
+            var config = new SiteConfiguration().AddContent(TestContent.Location("MultipleMarkdownFilesInNestedDirectories"));
+
+            await _sut.Generate(config);
+
+            Assert.That(_output.Files["/Index.html"], Is.Not.Null);
+            Assert.That(_output.Files["/inner/Index.html"], Is.Not.Null);
         }
 
         [Test]
