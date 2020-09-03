@@ -19,7 +19,14 @@ namespace Stasis.Output
         public void Save(string path, ProcessingResultBase contents)
         {
             path = path.TrimStart('/');
-            var fullPath = Path.Combine(DestinationPath, path);
+            var fullPath = Path.Combine(DestinationPath, path); 
+            
+            var dirOnly = Path.GetDirectoryName(fullPath);
+            if (!Directory.Exists(dirOnly))
+            {
+                Directory.CreateDirectory(dirOnly);
+            }
+
             File.WriteAllBytes(fullPath, contents.ContentBytes);
         }
 

@@ -25,7 +25,8 @@ namespace Stasis.DataExtraction
             {
                 return new TextItem
                 {
-                    Content = fileContents
+                    RawContent = fileContents,
+                    Content = Markdown.ToHtml(fileContents, _pipeline)
                 };
             }
 

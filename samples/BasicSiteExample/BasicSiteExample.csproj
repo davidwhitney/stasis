@@ -6,11 +6,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Site\foo.md" />
     <None Remove="Site\img\image.jpg" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="Site\img\image.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Site\foo.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Site\index.md">
