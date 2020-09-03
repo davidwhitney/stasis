@@ -12,8 +12,8 @@ namespace Stasis.TemplateEngines
             set => Content = Encoding.UTF8.GetString(value);
         }
 
-        public HtmlResult(string content, string outputPath) 
-            : base(outputPath)
+        public HtmlResult(string content, string outputName) 
+            : base(outputName)
         {
             Content = content;
         }

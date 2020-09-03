@@ -2,12 +2,12 @@
 {
     public abstract class ProcessingResultBase
     {
-        public string OutputPath { get; set; }
+        public string OutputName { get; set; }
         public abstract byte[] ContentBytes { get; set; }
 
-        protected ProcessingResultBase(string outputPath)
+        protected ProcessingResultBase(string outputName)
         {
-            OutputPath = outputPath;
+            OutputName = outputName;
         }
     }
 }

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Stasis.ContentModel;
 using Stasis.DataSources;
-using Stasis.TemplateDiscovery;
 
 namespace Stasis
 {
@@ -11,41 +9,46 @@ namespace Stasis
     {
         public List<ContentRegistration> ContentRegistrations { get; } = new List<ContentRegistration>();
 
-        public SiteConfiguration AddContent(string source, Action<ContentRegistration> onContentRegistrationCreation = null)
+        public SiteConfiguration AddContent(string source, string outpath, Action<ContentRegistration> onContentRegistrationCreation = null)
         {
-            if (Directory.Exists(source))
+            if (source.StartsWith("~/") || source.StartsWith("./"))
             {
-                AddContent(new DirectoryDataSource(source), onContentRegistrationCreation);
+                source = source.Replace("~/", "");
+                source = source.Replace("./", "");
+                source = Path.Combine(Environment.CurrentDirectory, source);
             }
-            else
+
+            if (!Directory.Exists(source))
             {
                 throw new InvalidOperationException("Data source not recognised");
             }
 
+            AddContent(new DirectoryDataSource(source), outpath, onContentRegistrationCreation);
             return this;
         }
 
-        public SiteConfiguration AddContent(Func<IAsyncEnumerable<RawItem>> loadItemsFunction, Action<ContentRegistration> onContentRegistrationCreation = null)
+        public SiteConfiguration AddContent(Func<IAsyncEnumerable<RawItem>> loadItemsFunction, string outpath, Action<ContentRegistration> onContentRegistrationCreation = null)
         {
             var delegatedDataSource = new DelegatedDataSource(loadItemsFunction);
-            AddContent(delegatedDataSource, onContentRegistrationCreation);
+            AddContent(delegatedDataSource, outpath, onContentRegistrationCreation);
             return this;
         }
 
-        public SiteConfiguration AddContent(Func<IEnumerable<RawItem>> loadItemsFunction, Action<ContentRegistration> onContentRegistrationCreation = null)
+        public SiteConfiguration AddContent(Func<IEnumerable<RawItem>> loadItemsFunction, string outpath, Action<ContentRegistration> onContentRegistrationCreation = null)
         {
             var delegatedDataSource = new DelegatedDataSource(loadItemsFunction);
-            AddContent(delegatedDataSource, onContentRegistrationCreation);
+            AddContent(delegatedDataSource, outpath, onContentRegistrationCreation);
             return this;
         }
 
-        public SiteConfiguration AddContent(IDataSource source, Action<ContentRegistration> onContentRegistrationCreation = null)
+        public SiteConfiguration AddContent(IDataSource source, string outpath, Action<ContentRegistration> onContentRegistrationCreation = null)
         {
             onContentRegistrationCreation ??= cr => { };
 
             var contentRegistration = new ContentRegistration
             {
-                DataSource = source
+                DataSource = source,
+                OutputPath = outpath
             };
 
             onContentRegistrationCreation(contentRegistration);

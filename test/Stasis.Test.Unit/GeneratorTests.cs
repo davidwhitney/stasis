@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using NUnit.Framework;
 using Stasis.Output;
 using Stasis.Test.Unit.TestHelpers;
@@ -23,7 +22,7 @@ namespace Stasis.Test.Unit
         [Test]
         public async Task Generate_SingleRazorFile_AddsHtmlFileToOutput()
         {
-            var config = new SiteConfiguration().AddContent(TestContent.Location("SingleRazorFile"));
+            var config = new SiteConfiguration().AddContent(TestContent.Location("SingleRazorFile"), "/");
 
             await _sut.Generate(config);
 
@@ -33,7 +32,7 @@ namespace Stasis.Test.Unit
         [Test]
         public async Task Generate_SingleMarkdownFile_AddsHtmlFileToOutput()
         {
-            var config = new SiteConfiguration().AddContent(TestContent.Location("SingleMarkdownFile"));
+            var config = new SiteConfiguration().AddContent(TestContent.Location("SingleMarkdownFile"), "/");
 
             await _sut.Generate(config);
 
@@ -44,18 +43,18 @@ namespace Stasis.Test.Unit
         [Test]
         public async Task Generate_MultipleMarkdownFiles_AddsHtmlFilesToOutputAsIndexFilesAtCorrectDepths()
         {
-            var config = new SiteConfiguration().AddContent(TestContent.Location("MultipleMarkdownFiles"));
+            var config = new SiteConfiguration().AddContent(TestContent.Location("MultipleMarkdownFiles"), "/");
 
             await _sut.Generate(config);
 
             Assert.That(_output.Files["/Index.html"], Is.Not.Null);
-            Assert.That(_output.Files["/Index2/Index.html"], Is.Not.Null);
+            Assert.That(_output.Files["/Index2/index.html"], Is.Not.Null);
         }
 
         [Test]
         public async Task Generate_MultipleMarkdownFilesInNestedDirectories_AddsHtmlFilesToOutput()
         {
-            var config = new SiteConfiguration().AddContent(TestContent.Location("MultipleMarkdownFilesInNestedDirectories"));
+            var config = new SiteConfiguration().AddContent(TestContent.Location("MultipleMarkdownFilesInNestedDirectories"), "/");
 
             await _sut.Generate(config);
 
@@ -67,7 +66,7 @@ namespace Stasis.Test.Unit
         public async Task Generate_SingleMarkdownFileWithLocalMustacheTemplate_TemplatesFile()
         {
             var config = new SiteConfiguration()
-                .AddContent(TestContent.Location("SingleMarkdownFileWithSameDirTemplate"));
+                .AddContent(TestContent.Location("SingleMarkdownFileWithSameDirTemplate"), "/");
 
             await _sut.Generate(config);
 
@@ -80,7 +79,7 @@ namespace Stasis.Test.Unit
         public async Task Generate_SingleMarkdownFileWithLocalMustacheTemplate_FrontMatterVariablesCanBeUsedInTemplate()
         {
             var config = new SiteConfiguration()
-                .AddContent(TestContent.Location("SingleMarkdownFileWithSameDirTemplate"));
+                .AddContent(TestContent.Location("SingleMarkdownFileWithSameDirTemplate"), "/");
 
             await _sut.Generate(config);
 
@@ -91,7 +90,7 @@ namespace Stasis.Test.Unit
         [Test]
         public async Task Generate_SingleRazorFile_EmbeddedCSharpExecuted()
         {
-            var config = new SiteConfiguration().AddContent(TestContent.Location("SingleRazorFile"));
+            var config = new SiteConfiguration().AddContent(TestContent.Location("SingleRazorFile"), "/");
 
             await _sut.Generate(config);
 

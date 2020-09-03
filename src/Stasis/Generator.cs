@@ -44,7 +44,7 @@ namespace Stasis
             var converter = ItemConverters.FirstOrDefault(x => x.Supports(rawItem.ContentType));
             if (converter == null)
             {
-                // Cannot handle this kind of item, log this.
+                CopyUnconvertableFile(rawItem, registration);
                 return;
             }
 
@@ -58,9 +58,25 @@ namespace Stasis
             item.SourceKey = rawItem.SourceKey;
             var contentProcessingResult = templateEngine.Process(item, template);
 
-            var outputPath = ProcessPath(contentProcessingResult.OutputPath);
+            var outputPath = ProcessPath(contentProcessingResult.OutputName);
+            var fullOutputPath = Path.Combine(registration.OutputPath, outputPath);
 
-            Output.Save(outputPath, contentProcessingResult);
+            Output.Save(fullOutputPath, contentProcessingResult);
+        }
+
+        private void CopyUnconvertableFile(RawItem rawItem, ContentRegistration registration)
+        {
+            var copyOuputPath = Path.Combine(registration.OutputPath, rawItem.SourceKey);
+
+            switch (rawItem)
+            {
+                case LocalFileSystemItem localFile:
+                    Output.Copy(localFile.ContentPath, copyOuputPath);
+                    break;
+                default:
+                    Output.Save(copyOuputPath, new BinaryResult(rawItem.Content, rawItem.SourceKey));
+                    break;
+            }
         }
 
         private string ProcessPath(string outputPath)

@@ -7,5 +7,6 @@ namespace Stasis
     {
         public IDataSource DataSource { get; set; }
         public IFindTemplates TemplateFinder { get; set; } = new DefaultTemplateLocationStrategy();
+        public string OutputPath { get; set; }
     }
 }

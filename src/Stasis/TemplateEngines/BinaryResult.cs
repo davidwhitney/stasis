@@ -4,8 +4,8 @@
     {
         public override byte[] ContentBytes { get; set; }
 
-        public BinaryResult(byte[] contentBytes, string outputPath)
-            : base(outputPath)
+        public BinaryResult(byte[] contentBytes, string outputName)
+            : base(outputName)
         {
             ContentBytes = contentBytes;
         }
